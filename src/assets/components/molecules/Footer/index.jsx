@@ -1,10 +1,10 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { FaAngleUp } from "react-icons/fa6"
 
 import { ArticleTitle } from "../../headers"
-import Logo from "../../../images/down-logo.png"
 import { LatestSlider } from "../.."
 import { socials } from "../../../data"
 
@@ -18,7 +18,12 @@ const Footer = () => {
 
             <p className="text-center mt-5">
               <Link href={"/"}>
-                <img src={Logo || "/placeholder.svg"} alt="Pacesetter Bottom Logo" width={300} />
+                <Image 
+                  src="/placeholder-logo.png" 
+                  alt="Pacesetter Bottom Logo" 
+                  width={300} 
+                  height={100}
+                />
               </Link>
             </p>
 

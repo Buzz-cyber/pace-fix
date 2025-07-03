@@ -3,13 +3,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { PiDotsThreeOutlineVerticalDuotone } from "react-icons/pi"
 import { TfiSearch, TfiUser } from "react-icons/tfi"
 import { SlMenu } from "react-icons/sl"
 
 import { navMenu } from "../../data"
 import MobileSide from "./MobileSide"
-import TopLogo from "../../images/top-logo.png"
 
 const NavBar = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -19,10 +19,8 @@ const NavBar = () => {
   const HandleSubmit = (e) => {
     e.preventDefault()
     const term = searchTerm.trim()
-    // Go to search page if criteria is met.
     if (term.length > 0) router.push(`/search/${term}`)
     setSearchTerm("")
-    // close search modal.
     const closeButton = document.getElementById("search-modal-close")
     if (closeButton) closeButton.click()
   }
@@ -32,7 +30,13 @@ const NavBar = () => {
       <div className="container">
         <div className="d-flex justify-content-between">
           <Link href={"/"}>
-            <img src={TopLogo || "/placeholder.svg"} alt="Pacesetter" height={70} />
+            <Image 
+              src="/placeholder-logo.png" 
+              alt="Pacesetter Frontier Magazine" 
+              height={70} 
+              width={200}
+              priority
+            />
           </Link>
           <div className="d-flex align-items-center fs-4 pointer">
             <div className="nav-body me-3 hide-on-sm">

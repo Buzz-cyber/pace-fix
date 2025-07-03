@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 
 import { Layout } from ".."
 import SideBar from "./SideBar"
@@ -18,7 +19,6 @@ import {
 import { usePostContext } from "../../context"
 import { Tags } from "../../data"
 
-import AltImage from "../../images/backup-img.jpg"
 import "./style.css"
 import { UseFetch } from "../../custom"
 import { Preloader } from "../../components/loaders"
@@ -58,7 +58,6 @@ const addGoogleAds = (paragraphs) => {
   }
 
   for (const index in paragraphs) {
-    // Add advert script every 4 paragraphs
     if (index % 4 === 0) {
       const addition = `
             <div class="ad-container">${adScripts[count]}</div>
@@ -76,14 +75,11 @@ const PostPage = ({ initialPost }) => {
   const [imgLoaded, setImgLoaded] = useState(true)
   const { postItem, updatePostItem } = usePostContext()
   
-  // Use initialPost from SSR if available, otherwise fall back to context or fetch
   const [currentPost, setCurrentPost] = useState(initialPost || postItem)
   
-  // get news id from url
   const newsID = typeof window !== "undefined" ? window.location.pathname.split("/")[2] : ""
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts/${newsID}`
   
-  // Only fetch if we don't have post data
   const shouldFetch = !currentPost || Object.keys(currentPost).length === 0
   const { loading, data } = UseFetch(shouldFetch ? url : null, `post_${newsID}`)
 
@@ -107,29 +103,24 @@ const PostPage = ({ initialPost }) => {
 
   const { title, yoast_head_json = {}, content, categories = [], id, tags = [] } = currentPost
   
-  // Safely access nested properties with fallbacks
   const ogImage = yoast_head_json.og_image?.[0]?.url || 
                   yoast_head_json.schema?.["@graph"]?.[2]?.url || 
-                  AltImage
+                  "/placeholder.svg"
   
-  const Image = imgLoaded ? ogImage : AltImage
+  const imageUrl = imgLoaded ? ogImage : "/placeholder.svg"
   const imgCaption = yoast_head_json.schema?.["@graph"]?.[2]?.caption || ""
   let information = content?.rendered || ""
 
   const addAdvertToNewsInfo = (html) => {
     if (!html) return ""
     
-    // Split the html into an array. separate using the paragraph.
     html = html.split("</p>")
     let count = 1
     let existingAdvert = typeof window !== "undefined" ? sessionStorage.getItem("pacesetter_adverts") : null
     if (existingAdvert) {
       try {
-        // Get advert from session Storage
         existingAdvert = JSON.parse(existingAdvert)
-        //   Loop through the array and add advert image to the chosen paragraph.
         for (const index in html) {
-          // Add advert image after every 2 paragraph if count is less than 5
           if (index % 3 === 0) {
             if (count >= 5) break
             else if (count < 5 && existingAdvert[count]?.image_file) {
@@ -148,7 +139,6 @@ const PostPage = ({ initialPost }) => {
           </div>
       `
               html[index] = html[index] + advertImage
-              // increment counter.
               count++
             }
           }
@@ -158,9 +148,7 @@ const PostPage = ({ initialPost }) => {
       }
     }
     html = addGoogleAds(html)
-    //   Join the modified html array into a string and return
     html = html.join("")
-    // Use regular expressions to replace width and remove height
     html = html.replace(/width="\d+"/g, 'width="100%"').replace(/height="\d+"/g, "")
 
     return html
@@ -173,7 +161,6 @@ const PostPage = ({ initialPost }) => {
     information = content?.rendered || ""
   }
 
-  // Ensure we have required data before rendering
   if (!title?.rendered) {
     return <div>Invalid post data</div>
   }
@@ -190,12 +177,15 @@ const PostPage = ({ initialPost }) => {
               </div>
               <div className="col-md-11 post-head">
                 <div className="post-image-holder text-center">
-                  <img src={Image || "/placeholder.svg"} alt="Post title" className="shadow rounded" />
-                  <img
-                    src={Image || "/placeholder.svg"}
-                    alt="Backup Pic"
-                    style={{ display: "none" }}
+                  <Image 
+                    src={imageUrl} 
+                    alt={title.rendered || "Post Image"} 
+                    width={800}
+                    height={500}
+                    className="shadow rounded"
+                    style={{ objectFit: "cover" }}
                     onError={() => setImgLoaded(false)}
+                    priority
                   />
                 </div>
                 {imgCaption && (
@@ -212,7 +202,6 @@ const PostPage = ({ initialPost }) => {
                 <SimpleSharers title={yoast_head_json.title || title.rendered} />
                 <WhatsappChannel />
                 <Disclaimer category={categories} />
-                {/* Comments */}
                 <CommentDetails post_id={id} />
                 <Adverts index={5} />
                 {tags && tags.length > 0 && (

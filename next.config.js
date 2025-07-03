@@ -8,14 +8,27 @@ const nextConfig = {
   },
   images: {
     domains: ["pacesetterfrontier.com", "localhost"],
-    unoptimized: true,
+    unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'pacesetterfrontier.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   experimental: {
     esmExternals: false,
   },
   async redirects() {
     return [
-      // Redirect old React Router paths to new Next.js paths
       {
         source: '/post/:id/:title*',
         destination: '/post/:id/:title',

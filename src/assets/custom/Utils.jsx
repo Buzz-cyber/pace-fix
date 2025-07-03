@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { Helmet } from "react-helmet-async"
 
 export const HandleWidth = () => {
   const [width, setWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200)
@@ -21,17 +20,11 @@ export const HandleWidth = () => {
 }
 
 export const manipulateDate = (dateString) => {
-  /*
-   * This function simply calculates the time given to it and returns how
-   * long it has been either as a yesterday, N days ago, last week, N weeks ago
-   * last month, N months ago and full time.
-   * */
   const originalTime = dateString.replace("T", " ")
   dateString = dateString.split("T")[0]
   const date = new Date(dateString)
   const today = new Date()
 
-  // Function to check if two dates are the same
   const isSameDate = (date1, date2) =>
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
@@ -47,12 +40,12 @@ export const manipulateDate = (dateString) => {
   if (diffInDays <= 7) return `${n} day(s) ago`
 
   const diffInWeeks = Math.floor(diffInDays / 7)
-  n = diffInWeeks // Update the value of n to be the number of weeks
+  n = diffInWeeks
   if (diffInWeeks === 1) return "Last week"
   if (diffInWeeks <= 5) return `${n} week(s) ago`
 
   const diffInMonths = Math.floor(diffInDays / 30)
-  n = diffInMonths // Update the value of n to correspond to months.
+  n = diffInMonths
   if (diffInMonths === 1) return "Last month"
   if (diffInMonths <= 12) return `${n} month(s) ago`
 
@@ -71,26 +64,8 @@ export const ScrollToTop = (props) => {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Code to change title on location change
-    let title = ""
-    if (pathname !== "/") {
-      // Get the last item in the url
-      let name = pathname.split("/")
-      let hold = name[name.length - 1]
-      //Try fetching name if title is not gotten
-      if (!hold) hold = name[name.length - 2]
-      // remove the - in the variable
-      name = hold.replaceAll("-", " ")
-      name = capitalizeFirstChars(name)
-      title = `${name} |-|`
-    }
-    // Modify title.
-    modifyTitle(title)
-
-    // Code to scroll up on location change!
     window.scrollTo({ top: 0, behavior: "smooth" })
 
-    // Code to ensure scrolling only after the new content is loaded
     const scrollAfterRender = () => {
       if (window.scrollY) {
         const scrollBtn = document.getElementById("scroll-top")
@@ -104,34 +79,8 @@ export const ScrollToTop = (props) => {
   return <>{props.children}</>
 }
 
-export const SocialPreviews = ({ title, description, name, type, image }) => {
-  return (
-    <Helmet>
-      <meta name="description" content={description} />
-
-      {/*  Facebook Tags*/}
-      <meta property="og:type" content={type} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
-
-      {/*  Twitter Tags*/}
-      <meta property="twitter:creator" content={name} />
-      <meta property="twitter:card" content={type} />
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-
-      {/*  Google Adsense*/}
-      <meta name="google-adsense-account" content="ca-pub-3536158399576400" />
-    </Helmet>
-  )
-}
-
 export const modifyTitle = (title) => {
-  // Simple function to modify and set title.
   title = title + " Pacesetter Frontier Magazine"
-  // replace %20 with spaces when seen.
   title = title.replaceAll("%20", " ")
   if (typeof document !== "undefined") {
     document.title = title.trim()
@@ -139,47 +88,28 @@ export const modifyTitle = (title) => {
 }
 
 export const isValidEmail = (email) => {
-  // Regular expression pattern for validating email addresses
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailPattern.test(email)
 }
 
 export const truncateExcerpt = (rendered, num = 15) => {
-  // Remove HTML tags
   const text = rendered.replace(/<\/?[^>]+(>|$)/g, "")
-  // Split the text into words
   const words = text.split(/\s+/)
-  // Take the first 15 words or given
   const truncatedText = words.slice(0, num).join(" ")
-  // Add the ellipsis and closing paragraph tag
   return `<p>${truncatedText} [&hellip;]</p>`
 }
 
 export const manipulateDate2 = (dateString) => {
-  // Create a Date object from the string
   const dateObj = new Date(dateString)
 
-  // Define an array of month names
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ]
 
-  // Get the month, day, and year from the Date object
   const month = monthNames[dateObj.getMonth()]
   const day = String(dateObj.getDate()).padStart(2, "0")
   const year = dateObj.getFullYear()
 
-  // Format the date as "Month DD, YYYY"
   return `${month} ${day}, ${year}`
 }

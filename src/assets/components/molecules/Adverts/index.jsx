@@ -1,21 +1,21 @@
 "use client"
 
 import PropTypes from "prop-types"
+import Image from "next/image"
 
 import UseFetch from "../../../custom/UseFetch"
 
-const AltImage = "/src/assets/images/default_advert.jpg"
+const AltImage = "/placeholder.svg"
 
 const Adverts = ({ index, hideLabel = false }) => {
   let image = AltImage
   const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}promotions/`
-  // Ensure default image is used when server is not accessible.
+  
   try {
     const { loading, data } = UseFetch(url, "adverts")
     if (loading) image = AltImage
     else {
-      image = data[index].image_file
-      if (!image) image = AltImage
+      image = data[index]?.image_file || AltImage
     }
   } catch (e) {
     console.error(e)
@@ -29,10 +29,13 @@ const Adverts = ({ index, hideLabel = false }) => {
           <small>Advertisement</small>
         </b>
       </p>
-      <img
-        src={image || "/placeholder.svg"}
+      <Image
+        src={image}
         alt={`Advert ${index}`}
+        width={400}
+        height={300}
         className={"img-thumbnail rounded advert-img-max-height"}
+        style={{ objectFit: "cover" }}
       />
     </div>
   )
@@ -40,6 +43,7 @@ const Adverts = ({ index, hideLabel = false }) => {
 
 Adverts.propTypes = {
   index: PropTypes.number.isRequired,
+  hideLabel: PropTypes.bool,
 }
 
 export default Adverts
