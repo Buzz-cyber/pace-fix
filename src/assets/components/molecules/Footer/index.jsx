@@ -30,7 +30,7 @@ const Footer = () => {
             <p className="text-justify text-white poppins my-4 lh-2">
               <b>Pacesetter Frontier Magazine</b> is a privately owned, quarterly published, multimedia, multi-connect,
               cosmopolitan, print and online magazine established in 2020 and headquartered in Enugu with a market
-              audience and base cutting across 11 states of Nigeria's 36 states and the nation's capital, Abuja.
+              audience and base cutting across 11 states of Nigeria's 36 states and the nation\'s capital, Abuja.
             </p>
           </div>
           <div className="col-md-6 p-3 pe-md-5">
