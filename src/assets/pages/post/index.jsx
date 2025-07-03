@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { Layout } from ".."
 import SideBar from "./SideBar"
@@ -20,7 +20,7 @@ import { Tags } from "../../data"
 
 import AltImage from "../../images/backup-img.jpg"
 import "./style.css"
-import { UseFetch, SocialPreviews } from "../../custom"
+import { UseFetch } from "../../custom"
 import { Preloader } from "../../components/loaders"
 
 const addGoogleAds = (paragraphs) => {
@@ -72,42 +72,43 @@ const addGoogleAds = (paragraphs) => {
   return paragraphs
 }
 
-const PostPage = () => {
+const PostPage = ({ initialPost }) => {
   const [imgLoaded, setImgLoaded] = useState(true)
-  const { postItem } = usePostContext()
-  let title, yoast_head_json, content, categories, id, tags
-  let information = ""
-  /*
-   * Here right before we get the image, we check if postItem is empty. If it is, we
-   * fetch the post and fetch every other post by categories. i.e., fetch all the items
-   * in the homepage, so we can proceed.
-   * */
-
-  // Always call hooks at the top level
+  const { postItem, updatePostItem } = usePostContext()
+  
+  // Use initialPost from SSR if available, otherwise fall back to context or fetch
+  const [currentPost, setCurrentPost] = useState(initialPost || postItem)
+  
   // get news id from url
   const newsID = typeof window !== "undefined" ? window.location.pathname.split("/")[2] : ""
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts/${newsID}`
-  // Fetch current news and store as post ID
-  const { loading, data } = UseFetch(url, `post_${newsID}`)
+  
+  // Only fetch if we don't have post data
+  const shouldFetch = !currentPost || Object.keys(currentPost).length === 0
+  const { loading, data } = UseFetch(shouldFetch ? url : null, `post_${newsID}`)
 
-  // Check postItem is not empty by confirming title
-  if (Object.keys(postItem).length === 0) {
-    if (loading) return <Preloader />
-    else {
-      // destructuring needed variables
-      ;({ title, yoast_head_json, content, categories, id, tags } = data)
-      // Usually when you get here using a copied url
+  useEffect(() => {
+    if (initialPost) {
+      setCurrentPost(initialPost)
+      updatePostItem(initialPost)
+    } else if (data && !loading) {
+      setCurrentPost(data)
+      updatePostItem(data)
     }
-  } else {
-    // When you are clicking a post from the main page.
-    ;({ title, yoast_head_json, content, categories, id, tags } = postItem)
-  }
-  const Image = imgLoaded ? yoast_head_json.og_image[0].url : AltImage
-  const imgCaption = yoast_head_json.schema["@graph"][2].caption
-  information = content.rendered
+  }, [initialPost, data, loading, updatePostItem])
 
-  // Set up variables for meta details
-  const { title: og_title, twitter_creator, twitter_card, og_description, og_image } = yoast_head_json
+  if (shouldFetch && loading) {
+    return <Preloader />
+  }
+
+  if (!currentPost || Object.keys(currentPost).length === 0) {
+    return <div>Post not found</div>
+  }
+
+  const { title, yoast_head_json, content, categories, id, tags } = currentPost
+  const Image = imgLoaded ? yoast_head_json.og_image[0].url : AltImage
+  const imgCaption = yoast_head_json.schema["@graph"][2]?.caption || ""
+  let information = content.rendered
 
   const addAdvertToNewsInfo = (html) => {
     // Split the html into an array. separate using the paragraph.
@@ -149,8 +150,6 @@ const PostPage = () => {
     html = html.join("")
     // Use regular expressions to replace width and remove height
     html = html.replace(/width="\d+"/g, 'width="100%"').replace(/height="\d+"/g, "")
-    // Don't know why i added the line below.
-    // html = html.replace("<figure");
 
     return html
   }
@@ -164,13 +163,6 @@ const PostPage = () => {
 
   return (
     <Layout>
-      <SocialPreviews
-        name={twitter_creator}
-        type={twitter_card}
-        title={og_title}
-        description={og_description}
-        image={og_image[0].url}
-      />
       <div className="post-container my-5">
         <div className="row">
           <div className="col-md-9">
@@ -204,12 +196,12 @@ const PostPage = () => {
                 {/* Comments */}
                 <CommentDetails post_id={id} />
                 <Adverts index={5} />
-                {tags.length > 0 && (
+                {tags && tags.length > 0 && (
                   <div className="mb-3">
                     <span className="badge rounded-pill bg-dark">Tags</span>
                     {tags.map((tag, index) => (
                       <small key={index} className="badge rounded-pill bg-light ms-2 text-muted">
-                        {Tags[tag]}
+                        {Tags[tag] || `Tag ${tag}`}
                       </small>
                     ))}
                   </div>
