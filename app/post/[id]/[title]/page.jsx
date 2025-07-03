@@ -29,11 +29,11 @@ export async function generateMetadata({ params }) {
     }
   }
 
-  const { title, yoast_head_json } = post
-  const cleanTitle = title.rendered.replace(/<[^>]*>/g, '')
-  const description = yoast_head_json.og_description || yoast_head_json.description
-  const image = yoast_head_json.og_image?.[0]?.url || '/logo.png'
-  const author = yoast_head_json.author
+  const { title, yoast_head_json = {} } = post
+  const cleanTitle = title?.rendered?.replace(/<[^>]*>/g, '') || 'Untitled Post'
+  const description = yoast_head_json.og_description || yoast_head_json.description || 'Read the latest news and articles from Pacesetter Frontier Magazine.'
+  const image = yoast_head_json.og_image?.[0]?.url || yoast_head_json.schema?.["@graph"]?.[2]?.url || '/logo.png'
+  const author = yoast_head_json.author || 'Pacesetter Frontier Magazine'
   const publishedTime = post.date
   const modifiedTime = post.modified
 
@@ -83,6 +83,8 @@ export default async function PostDetailPage({ params }) {
 export async function generateStaticParams() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}posts?per_page=100`)
+    if (!res.ok) return []
+    
     const posts = await res.json()
     
     return posts.map((post) => ({

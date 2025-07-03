@@ -105,44 +105,56 @@ const PostPage = ({ initialPost }) => {
     return <div>Post not found</div>
   }
 
-  const { title, yoast_head_json, content, categories, id, tags } = currentPost
-  const Image = imgLoaded ? yoast_head_json.og_image[0].url : AltImage
-  const imgCaption = yoast_head_json.schema["@graph"][2]?.caption || ""
-  let information = content.rendered
+  const { title, yoast_head_json = {}, content, categories = [], id, tags = [] } = currentPost
+  
+  // Safely access nested properties with fallbacks
+  const ogImage = yoast_head_json.og_image?.[0]?.url || 
+                  yoast_head_json.schema?.["@graph"]?.[2]?.url || 
+                  AltImage
+  
+  const Image = imgLoaded ? ogImage : AltImage
+  const imgCaption = yoast_head_json.schema?.["@graph"]?.[2]?.caption || ""
+  let information = content?.rendered || ""
 
   const addAdvertToNewsInfo = (html) => {
+    if (!html) return ""
+    
     // Split the html into an array. separate using the paragraph.
     html = html.split("</p>")
     let count = 1
     let existingAdvert = typeof window !== "undefined" ? sessionStorage.getItem("pacesetter_adverts") : null
     if (existingAdvert) {
-      // Get advert from session Storage
-      existingAdvert = JSON.parse(existingAdvert)
-      //   Loop through the array and add advert image to the chosen paragraph.
-      for (const index in html) {
-        // Add advert image after every 2 paragraph if count is less than 5
-        if (index % 3 === 0) {
-          if (count >= 5) break
-          else if (count < 5) {
-            const advertImage = `
-            <div class="text-center my-4">
-              <p>
-                <b>
-                  <small>Advertisement</small>
-                </b>
-              </p>
-              <img
-                src=${existingAdvert[count].image_file}
-                alt="Advert ${count}"
-                class="img-thumbnail rounded advert-img-max-height"
-              />
-        </div>
-    `
-            html[index] = html[index] + advertImage
-            // increment counter.
-            count++
+      try {
+        // Get advert from session Storage
+        existingAdvert = JSON.parse(existingAdvert)
+        //   Loop through the array and add advert image to the chosen paragraph.
+        for (const index in html) {
+          // Add advert image after every 2 paragraph if count is less than 5
+          if (index % 3 === 0) {
+            if (count >= 5) break
+            else if (count < 5 && existingAdvert[count]?.image_file) {
+              const advertImage = `
+              <div class="text-center my-4">
+                <p>
+                  <b>
+                    <small>Advertisement</small>
+                  </b>
+                </p>
+                <img
+                  src=${existingAdvert[count].image_file}
+                  alt="Advert ${count}"
+                  class="img-thumbnail rounded advert-img-max-height"
+                />
+          </div>
+      `
+              html[index] = html[index] + advertImage
+              // increment counter.
+              count++
+            }
           }
         }
+      } catch (e) {
+        console.error("Error parsing adverts from session storage:", e)
       }
     }
     html = addGoogleAds(html)
@@ -158,7 +170,12 @@ const PostPage = ({ initialPost }) => {
     information = addAdvertToNewsInfo(information)
   } catch (e) {
     console.error("Error joining advert images to post.", e)
-    information = content.rendered
+    information = content?.rendered || ""
+  }
+
+  // Ensure we have required data before rendering
+  if (!title?.rendered) {
+    return <div>Invalid post data</div>
   }
 
   return (
@@ -169,7 +186,7 @@ const PostPage = ({ initialPost }) => {
             <Adverts index={0} />
             <div className="row">
               <div className="col-md-1 sharers">
-                <Sharers title={yoast_head_json.title} />
+                <Sharers title={yoast_head_json.title || title.rendered} />
               </div>
               <div className="col-md-11 post-head">
                 <div className="post-image-holder text-center">
@@ -181,16 +198,18 @@ const PostPage = ({ initialPost }) => {
                     onError={() => setImgLoaded(false)}
                   />
                 </div>
-                <p className="fw-bold mx-auto mt-2 text-muted">
-                  <small>{imgCaption}</small>
-                </p>
+                {imgCaption && (
+                  <p className="fw-bold mx-auto mt-2 text-muted">
+                    <small>{imgCaption}</small>
+                  </p>
+                )}
               </div>
             </div>
             <div className="row my-1 align-items-start">
               <div className="col-md-12 px-0">
                 <PostTitle title={title.rendered} details={yoast_head_json} categories={categories} />
                 <div dangerouslySetInnerHTML={{ __html: information }} className="news-holder pe-md-3" />
-                <SimpleSharers title={yoast_head_json.title} />
+                <SimpleSharers title={yoast_head_json.title || title.rendered} />
                 <WhatsappChannel />
                 <Disclaimer category={categories} />
                 {/* Comments */}
