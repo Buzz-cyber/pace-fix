@@ -24,9 +24,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    esmExternals: false,
-  },
   async redirects() {
     return [
       {
