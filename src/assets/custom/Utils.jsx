@@ -4,12 +4,16 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 
 export const HandleWidth = () => {
-  const [width, setWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200)
+  const [width, setWidth] = useState(1200) // Default width for SSR
 
   useEffect(() => {
+    // Set initial width after component mounts
+    setWidth(window.innerWidth)
+    
     const handleResize = () => {
       setWidth(window.innerWidth)
     }
+    
     window.addEventListener("resize", handleResize)
     return () => {
       window.removeEventListener("resize", handleResize)

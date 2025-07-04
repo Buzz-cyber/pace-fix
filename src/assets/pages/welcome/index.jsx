@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import BusinessEconomy from "./BusinessEconomy"
 import Education from "./Education"
 import Entertainment from "./Entertainment"
@@ -23,28 +24,41 @@ import { Adverts } from "../../components"
 
 import "./index.css"
 
-const resizePostListings = () => {
-  /* 
-    Function to ensure the Post Listing column maintains the same height
-    with the sidebar (or similar height).
-     */
-  //     Ensure this plays out if the width of the device is greater than 770px
-  const innerWidth = window.innerWidth
-  if (innerWidth <= 770) return null
-  //     Get the div elements by their IDs
-  const sideBarDiv = document.getElementById("my-side-bar")
-  const postLists = document.getElementById("my-post-listing")
-  //     Get the height of the all divs in sidebar and top 100px to it
-  let height = 0
-  for (const div of sideBarDiv.children) height += div.clientHeight
-  height = height += 150
-  //     Style up the maximum height of the post listing div
-  postLists.style.height = `${height}px`
-}
-
 const Welcome = () => {
-  // Resize after 10secs
-  setTimeout(resizePostListings, 4000)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    
+    // Resize function that only runs on client
+    const resizePostListings = () => {
+      if (typeof window === "undefined") return
+      
+      const innerWidth = window.innerWidth
+      if (innerWidth <= 770) return null
+      
+      const sideBarDiv = document.getElementById("my-side-bar")
+      const postLists = document.getElementById("my-post-listing")
+      
+      if (!sideBarDiv || !postLists) return
+      
+      let height = 0
+      for (const div of sideBarDiv.children) height += div.clientHeight
+      height = height += 150
+      
+      postLists.style.height = `${height}px`
+    }
+
+    // Resize after component mounts and DOM is ready
+    const timer = setTimeout(resizePostListings, 4000)
+    
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!isClient) {
+    return null // or a loading spinner
+  }
+
   return (
     <Layout>
       <HeroSlider />

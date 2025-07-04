@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Slider from "react-slick"
 
@@ -9,6 +10,8 @@ import { Adverts, TopHero } from "../../components"
 import { usePostContext } from "../../context"
 
 const HeroSlider = () => {
+  const [isClient, setIsClient] = useState(false)
+  
   // programmatically resize slider with width and get general API URL
   const width = HandleWidth()
   // keep this field prefix for the url ...
@@ -19,6 +22,10 @@ const HeroSlider = () => {
 
   const router = useRouter()
   const { updatePostItem } = usePostContext()
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Settings needed by the slider (including responsive for center appearance)
   const sliderSettings = {
@@ -40,32 +47,34 @@ const HeroSlider = () => {
       },
     ],
   }
-  if (loading) return <Preloader fixed />
-  else {
-    return (
-      <div className="row my-5 m-auto">
-        <Adverts index={0} />
-        <Slider {...sliderSettings}>
-          {data.slice(4, 10).map((item) => {
-            // ?_fields=id,date,slug,title,yoast_head_json.og_image,yoast_head_json.author,content,
-            // const {id, date, slug, title, content, categories, yoast_head_json} = item;
-            const { id, slug } = item
-
-            const handlePostClick = () => {
-              updatePostItem(item)
-              router.push(`/post/${id}/${slug}`)
-            }
-
-            return (
-              <div onClick={handlePostClick} className="text-decoration-none pointer" key={id}>
-                <TopHero {...item} />
-              </div>
-            )
-          })}
-        </Slider>
-      </div>
-    )
+  
+  if (!isClient || loading) {
+    return <Preloader fixed />
   }
+
+  return (
+    <div className="row my-5 m-auto">
+      <Adverts index={0} />
+      <Slider {...sliderSettings}>
+        {data.slice(4, 10).map((item) => {
+          // ?_fields=id,date,slug,title,yoast_head_json.og_image,yoast_head_json.author,content,
+          // const {id, date, slug, title, content, categories, yoast_head_json} = item;
+          const { id, slug } = item
+
+          const handlePostClick = () => {
+            updatePostItem(item)
+            router.push(`/post/${id}/${slug}`)
+          }
+
+          return (
+            <div onClick={handlePostClick} className="text-decoration-none pointer" key={id}>
+              <TopHero {...item} />
+            </div>
+          )
+        })}
+      </Slider>
+    </div>
+  )
 }
 
 export default HeroSlider

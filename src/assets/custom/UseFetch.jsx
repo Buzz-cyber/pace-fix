@@ -6,8 +6,15 @@ import PropTypes from "prop-types"
 const UseFetch = (url, cacheName = "") => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState([])
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const getData = useCallback(async () => {
+    if (!url || !isClient) return
+
     try {
       // We checked if it's cached and then retrieve it.
       const storageName = `pacesetter_${cacheName}`
@@ -28,18 +35,19 @@ const UseFetch = (url, cacheName = "") => {
     } catch (error) {
       console.log("Fetch Error occurred.")
       console.error(error)
+      setLoading(false)
     }
-  }, [url, cacheName])
+  }, [url, cacheName, isClient])
 
   useEffect(() => {
     getData()
-  }, [url, getData])
+  }, [getData])
 
   return { loading, data }
 }
 
 UseFetch.propTypes = {
-  url: PropTypes.string.isRequired,
+  url: PropTypes.string,
   cacheName: PropTypes.string,
 }
 
