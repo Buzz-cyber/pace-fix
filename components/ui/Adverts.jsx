@@ -2,18 +2,15 @@
 
 import { useState, useEffect } from "react"
 import PropTypes from "prop-types"
-import Image from "next/image"
-
-import UseFetch from "../../../custom/UseFetch"
-
-const AltImage = "/placeholder.svg"
+import SafeImage from "./SafeImage"
+import { useFetch } from "../../lib/hooks/useFetch"
 
 const Adverts = ({ index, hideLabel = false }) => {
   const [isClient, setIsClient] = useState(false)
-  const [image, setImage] = useState(AltImage)
+  const [image, setImage] = useState("/placeholder.svg")
   
   const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}promotions/`
-  const { loading, data } = UseFetch(url, "adverts")
+  const { loading, data } = useFetch(url, "adverts")
 
   useEffect(() => {
     setIsClient(true)
@@ -21,7 +18,7 @@ const Adverts = ({ index, hideLabel = false }) => {
 
   useEffect(() => {
     if (isClient && !loading && data && data[index]) {
-      setImage(data[index]?.image_file || AltImage)
+      setImage(data[index]?.image_file || "/placeholder.svg")
     }
   }, [isClient, loading, data, index])
 
@@ -33,8 +30,8 @@ const Adverts = ({ index, hideLabel = false }) => {
             <small>Advertisement</small>
           </b>
         </p>
-        <Image
-          src={AltImage}
+        <SafeImage
+          src="/placeholder.svg"
           alt={`Advert ${index}`}
           width={400}
           height={300}
@@ -52,7 +49,7 @@ const Adverts = ({ index, hideLabel = false }) => {
           <small>Advertisement</small>
         </b>
       </p>
-      <Image
+      <SafeImage
         src={image}
         alt={`Advert ${index}`}
         width={400}

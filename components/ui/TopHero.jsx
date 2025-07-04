@@ -1,21 +1,22 @@
 "use client"
 
 import PropTypes from "prop-types"
-import Image from "next/image"
-
-import { AuthorTime } from "../metaInfo"
-
-import "./style.css"
-import { Categories } from "../../data"
+import SafeImage from "./SafeImage"
+import { AuthorTime } from "./AuthorTime"
+import { Categories } from "../../lib/data"
 import Link from "next/link"
 
+import "./VerticalSegment.css"
+
 const TopHero = ({ id, date, slug, title, content, categories, yoast_head_json }) => {
-  const imageUrl = yoast_head_json?.og_image?.[0]?.url || "/placeholder.svg"
+  const imageUrl = yoast_head_json?.og_image?.[0]?.url || 
+                   yoast_head_json?.schema?.["@graph"]?.[2]?.url || 
+                   "/placeholder.svg"
   const author = yoast_head_json?.author || "Pacesetter Frontier Magazine"
 
   return (
     <div className="col-md-12 p-2 mx-2 top-hero d-flex shadow" style={{ backgroundImage: `url(${imageUrl})` }}>
-      <Image
+      <SafeImage
         src={imageUrl}
         alt={title?.rendered || "News Image"}
         width={800}
