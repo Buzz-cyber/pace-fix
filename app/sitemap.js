@@ -1,5 +1,7 @@
 import { getDb } from '../utils/mongodb.js';
 
+export const revalidate = 86400; // cache sitemap for 24h
+
 export default async function sitemap() {
   const baseUrl = 'https://pacesetterfrontier.com';
 
@@ -7,31 +9,31 @@ export default async function sitemap() {
   const staticPages = [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: new Date("2025-07-06"),
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/about-us`,
-      lastModified: new Date(),
+      lastModified: new Date("2025-07-06"),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/contact-us`,
-      lastModified: new Date(),
+      lastModified: new Date("2025-07-06"),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
+      lastModified: new Date("2025-07-06"),
       changeFrequency: 'yearly',
       priority: 0.5,
     },
     {
       url: `${baseUrl}/terms-and-conditions`,
-      lastModified: new Date(),
+      lastModified: new Date("2025-07-06"),
       changeFrequency: 'yearly',
       priority: 0.5,
     },
@@ -45,7 +47,7 @@ export default async function sitemap() {
     const posts = await postsCollection
       .find({ status: 'publish' })
       .sort({ updatedAt: -1 })
-      .limit(10000)
+      .limit(2000)
       .toArray();
 
     const postPages = posts.map(post => ({

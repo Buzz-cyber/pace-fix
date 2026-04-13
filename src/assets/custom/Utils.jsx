@@ -71,24 +71,8 @@ export const ScrollToTop = (props) => {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Code to change title on location change
-    let title = ""
-    if (pathname !== "/") {
-      // Get the last item in the url
-      let name = pathname.split("/")
-      let hold = name[name.length - 1]
-      //Try fetching name if title is not gotten
-      if (!hold) hold = name[name.length - 2]
-      // remove the - in the variable
-      name = hold.replaceAll("-", " ")
-      name = capitalizeFirstChars(name)
-      title = `${name} |-|`
-    }
-    // Modify title.
-    modifyTitle(title)
-
-    // Code to scroll up on location change!
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    // Keep this lightweight: metadata handles titles; smooth scrolling can jank on low-end devices.
+    window.scrollTo({ top: 0 })
 
     // Code to ensure scrolling only after the new content is loaded
     const scrollAfterRender = () => {
@@ -148,8 +132,8 @@ export const truncateExcerpt = (rendered, num = 15) => {
   const words = text.split(/\s+/)
   // Take the first 15 words or given
   const truncatedText = words.slice(0, num).join(" ")
-  // Add the ellipsis and closing paragraph tag
-  return `<p>${truncatedText} [&hellip;]</p>`
+  // Return inline HTML (avoid nested <p> hydration issues)
+  return `${truncatedText} [&hellip;]`
 }
 
 export const manipulateDate2 = (dateString) => {

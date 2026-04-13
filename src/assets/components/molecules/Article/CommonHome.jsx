@@ -11,7 +11,7 @@ import { VerticalSegment } from "../../newsItem";
 import { UseFetch, getKeyByValue } from "../../../custom";
 import { Categories } from "../../../data";
 
-const CommonHome = ({ name, start, skip = 4, columns = 6, extras = "" }) => {
+const CommonHome = ({ name, start, skip = 4, columns = 6, extras = "", initialPosts = null }) => {
   const categoryId = getKeyByValue(Categories, name) ?? 6;
 
   const url = extras.trim()
@@ -19,7 +19,10 @@ const CommonHome = ({ name, start, skip = 4, columns = 6, extras = "" }) => {
     : `${process.env.NEXT_PUBLIC_API_URL}posts?categories=${categoryId}&per_page=12`;
 
   const [begin, setBegin] = useState(start);
-  const { loading, data } = UseFetch(url, `posts_${name}`); // 👈 fetch immediately
+  const shouldFetch = !(Array.isArray(initialPosts) && initialPosts.length > 0);
+  const { loading, data } = shouldFetch
+    ? UseFetch(url, `posts_${name}`)
+    : { loading: false, data: initialPosts };
 
   const handleClick = () => setBegin((prev) => prev + skip);
 
@@ -56,6 +59,7 @@ CommonHome.propTypes = {
   skip: PropTypes.number,
   columns: PropTypes.number,
   extras: PropTypes.string,
+  initialPosts: PropTypes.array,
 };
 
 export default CommonHome;

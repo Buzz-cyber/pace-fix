@@ -1,19 +1,22 @@
 "use client"
 import { useRouter } from "next/navigation"
 import Slider from "react-slick"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
 import { HandleWidth, UseFetch } from "../../custom"
 import { Preloader } from "../../components/loaders"
 import { TopHero, AdsSliderStrip } from "../../components"
 import { usePostContext } from "../../context"
 import GoogleAd from "@/app/googleAd/ad"
 
-const HeroSlider = () => {
+const HeroSlider = ({ initialPosts = null }) => {
   const width = HandleWidth()
   const router = useRouter()
   const { updatePostItem } = usePostContext()
 
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts?per_page=10`
-  const { loading, data } = UseFetch(url, "posts")
+  const shouldFetch = !(Array.isArray(initialPosts) && initialPosts.length > 0)
+  const { loading, data } = shouldFetch ? UseFetch(url, "posts") : { loading: false, data: initialPosts }
 
   const slidesToShow = width < 800 ? 1 : width < 1000 ? 2 : 3
 

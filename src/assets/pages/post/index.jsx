@@ -69,8 +69,12 @@ const PostPage = () => {
   useEffect(() => {
     if (!newsID) return
     fetch(`/api/views/${newsID}`, { method: "POST" })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return null
+        return await res.json()
+      })
       .then((data) => {
+        if (!data) return
         if (typeof data.views === "number") {
           // Deterministic random offset based on newsID (1000-2000 range)
           let seed = 0;

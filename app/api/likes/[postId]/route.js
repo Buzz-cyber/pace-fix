@@ -10,7 +10,7 @@ export async function GET(request, context) {
     return Response.json({ postId, likes });
   } catch (error) {
     console.error('GET error:', error);
-    return new Response('Database error', { status: 500 });
+    return Response.json({ error: "Database error" }, { status: 500 });
   }
 }
 
@@ -28,6 +28,6 @@ export async function POST(request, context) {
     return Response.json({ postId, likes });
   } catch (error) {
     console.error('POST error:', error);
-    return new Response('Database error', { status: 500 });
+    return Response.json({ error: "Database error" }, { status: 500 });
   }
 }

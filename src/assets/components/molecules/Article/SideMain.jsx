@@ -7,9 +7,10 @@ import { TextFirstSegment } from "../../newsItem"
 import { UseFetch } from "../../../custom"
 import { LatestSlider, ArticleTitle, Adverts } from "../.."
 
-const SideMain = () => {
+const SideMain = ({ initialPosts = null }) => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts`
-  const { loading, data } = UseFetch(url, "posts")
+  const useInitial = Array.isArray(initialPosts) && initialPosts.length > 0
+  const { loading, data } = useInitial ? { loading: false, data: initialPosts } : UseFetch(url, "posts")
 
   return (
     <>
@@ -27,7 +28,7 @@ const SideMain = () => {
 
       <div>
         <ArticleTitle title="latest" width={30} class_="fs-5" />
-        <LatestSlider class_="mt-5" />
+        <LatestSlider class_="mt-5" initialPosts={data} />
         <Adverts index={5} />
       </div>
     </>

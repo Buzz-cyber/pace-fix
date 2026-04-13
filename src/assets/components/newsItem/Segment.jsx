@@ -43,8 +43,12 @@ export const VerticalSegment = ({
   useEffect(() => {
     if (!id) return;
     fetch(`/api/views/${id}`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return null
+        return await res.json()
+      })
       .then((data) => {
+        if (!data) return
         if (typeof data.views === "number") setViews(data.views);
       })
       .catch((err) => {
@@ -125,8 +129,12 @@ export const TextFirstSegment = ({
   useEffect(() => {
     if (!id) return;
     fetch(`/api/views/${id}`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return null
+        return await res.json()
+      })
       .then((data) => {
+        if (!data) return
         if (typeof data.views === "number") setViews(data.views);
       })
       .catch((err) => {
@@ -189,8 +197,12 @@ export const LittlePieceSegment = ({
   useEffect(() => {
     if (!id) return;
     fetch(`/api/views/${id}`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return null
+        return await res.json()
+      })
       .then((data) => {
+        if (!data) return
         if (typeof data.views === "number") setViews(data.views);
       })
       .catch((err) => {

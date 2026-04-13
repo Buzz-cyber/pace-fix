@@ -3,8 +3,6 @@ import Script from "next/script";
 
 import { ScrollToTop } from "../src/assets/custom/Utils";
 import "../src/index.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import Providers from "../src/assets/providers/Providers";
 import BootstrapClientScript from "@/components/BootstrapClientScript";
 

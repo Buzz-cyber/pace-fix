@@ -10,16 +10,12 @@ const nextConfig = {
     domains: ["pacesetterfrontier.com", "localhost", "api.pacesetterfrontier.com"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
-    formats: ['image/webp'],
-  },
-  experimental: {
-    esmExternals: false,
+    minimumCacheTTL: 86400,
+    formats: ["image/avif", "image/webp"],
   },
   output: "standalone",
-  swcMinify: true,
-  optimizeFonts: true,
   compress: true,
+  poweredByHeader: false,
 }
 
 module.exports = nextConfig

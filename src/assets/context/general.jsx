@@ -17,10 +17,6 @@ export const GeneralProvider = ({ children }) => {
     setIsSubmenu(!isSubmenu)
   }
 
-  useEffect(() => {
-    console.log("Setting postItem:", "postItem")
-  }, [postItem])
-
   return (
     <GeneralContext.Provider
       value={{

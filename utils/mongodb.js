@@ -1,35 +1,31 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-const uri = "mongodb+srv://buzz:buzz@cluster0.j2e8o.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
+function getClientPromise() {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("Missing MONGODB_URI environment variable");
   }
-});
 
-// Connection pool
-let clientPromise;
-
-if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
+  // Connection pool: cache across hot reloads and serverless warm instances.
   if (!global._mongoClientPromise) {
+    const client = new MongoClient(uri, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      },
+    });
     global._mongoClientPromise = client.connect();
   }
-  clientPromise = global._mongoClientPromise;
-} else {
-  // In production mode, it's best to not use a global variable.
-  clientPromise = client.connect();
+
+  return global._mongoClientPromise;
 }
 
-export default clientPromise;
+export default getClientPromise;
 
 // Helper function to get the database
 export async function getDb() {
-  const client = await clientPromise;
+  const client = await getClientPromise();
   return client.db("pace-setter");
 }
 
@@ -48,6 +44,11 @@ export async function getViewsCollection() {
 export async function getAdPositionsCollection() {
   const db = await getDb();
   return db.collection("ad_positions");
+}
+
+export async function getAdSlotsCollection() {
+  const db = await getDb();
+  return db.collection("ad_slots");
 }
 
 export async function getCustomAdsCollection() {

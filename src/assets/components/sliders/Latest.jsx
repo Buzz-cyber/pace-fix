@@ -1,6 +1,8 @@
 "use client"
 
 import Slider from "react-slick"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
 
 import { Categories } from "../../data"
 import { LittlePieceSegment, VerticalSegment } from "../newsItem"
@@ -27,10 +29,11 @@ const getCategory = (ids) => {
   return { name: "news", id: 6 }
 }
 
-const Latest = ({ light = false, class_ = "" }) => {
+const Latest = ({ light = false, class_ = "", initialPosts = null }) => {
   // fetch posts
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts`
-  const { loading, data } = UseFetch(url, "posts")
+  const useInitial = Array.isArray(initialPosts) && initialPosts.length > 0
+  const { loading, data } = useInitial ? { loading: false, data: initialPosts } : UseFetch(url, "posts")
 
   if (loading)
     return (
@@ -51,10 +54,11 @@ const Latest = ({ light = false, class_ = "" }) => {
   }
 }
 
-export const SideBar = ({ class_ = "" }) => {
+export const SideBar = ({ class_ = "", initialPosts = null }) => {
   // fetch post if it doesn't already exist
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts`
-  const { loading, data } = UseFetch(url, "posts")
+  const useInitial = Array.isArray(initialPosts) && initialPosts.length > 0
+  const { loading, data } = useInitial ? { loading: false, data: initialPosts } : UseFetch(url, "posts")
 
   if (loading)
     return (
