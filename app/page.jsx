@@ -26,7 +26,7 @@ export const metadata = {
   },
 };
 
-export const revalidate = 60;
+export const revalidate = 30; // Revalidate every 30 seconds for fresh content
 
 const SECTION_NAMES = [
   "News",
@@ -55,7 +55,12 @@ function categoryIdByName(name) {
 }
 
 async function fetchJson(url) {
-  const res = await fetch(url, { next: { revalidate } });
+  // Use no-store for ads/promotions to always get fresh data
+  const isAds = url.includes('promotions');
+  const fetchOptions = isAds
+    ? { cache: 'no-store' }
+    : { next: { revalidate } };
+  const res = await fetch(url, fetchOptions);
   if (!res.ok) return [];
   return res.json();
 }

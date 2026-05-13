@@ -56,14 +56,14 @@ const AdsSliderStrip = () => {
         }
         
         .ad-slider-container {
-          height: 120px;
+          height: 200px;
         }
-        
+
         .ad-slide {
           display: flex !important;
           justify-content: center;
           align-items: center;
-          height: 120px;
+          height: 200px;
           outline: none;
         }
 

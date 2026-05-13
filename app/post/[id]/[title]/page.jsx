@@ -6,8 +6,10 @@ export async function generateMetadata(context) {
   const { id, title } = params;
 
   try {
-    // Fetch post data from your API
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}posts/${id}`);
+    // Fetch post data from your API - no cache for fresh content
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}posts/${id}`, {
+      cache: 'no-store'
+    });
     if (!res.ok) return {};
 
     const data = await res.json();

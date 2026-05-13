@@ -8,21 +8,42 @@ const fetcher = async (url) => {
   return response.json();
 };
 
-const useFetch = (url) => {
-  const { data, error, isLoading } = useSWR(url, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 600000, // Cache for 10 minutes
-    shouldRetryOnError: false,
-    revalidateIfStale: false, // Don't auto-revalidate stale data
-    focusThrottleInterval: 300000, // Throttle focus revalidation to 5 minutes
-    keepPreviousData: true, // Keep showing old data while fetching new
+// Cache durations in milliseconds
+const CACHE_DURATIONS = {
+  ADS: 30000,        // 30 seconds - ads change frequently
+  POSTS: 60000,      // 1 minute - posts can be published anytime
+  STATIC: 300000,    // 5 minutes - rarely changing data
+};
+
+const getCacheDuration = (key) => {
+  // Ads fetch uses 'adverts' key
+  if (key === 'adverts') return CACHE_DURATIONS.ADS;
+  // Posts fetch uses keys starting with 'posts_'
+  if (key?.startsWith('posts_')) return CACHE_DURATIONS.POSTS;
+  // Default for other data
+  return CACHE_DURATIONS.STATIC;
+};
+
+const useFetch = (url, cacheKey = null) => {
+  // Generate a unique cache key based on URL or provided key
+  const swrKey = cacheKey ? `${url}__${cacheKey}` : url;
+  const dedupingInterval = getCacheDuration(cacheKey);
+
+  const { data, error, isLoading, mutate } = useSWR(swrKey, () => fetcher(url), {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    dedupingInterval,
+    shouldRetryOnError: true,
+    revalidateIfStale: true,
+    focusThrottleInterval: 15000, // 15 seconds minimum between revalidations on focus
+    keepPreviousData: true,
   });
 
   return {
     data: Array.isArray(data) ? data : [],
     loading: isLoading,
     error: error ? error.message || "Something went wrong" : null,
+    refresh: mutate, // Expose manual refresh function
   };
 };
 
