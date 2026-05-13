@@ -3,7 +3,7 @@
 import { Layout } from "..";
 import HeroSlider from "./HeroSlider";
 import "./index.css";
-import { Adverts, Common, SideMain } from "../../components";
+import { Adverts, Common, SideMain, PromotionsProvider } from "../../components";
 
 const SECTION_NAMES = [
   "News",
@@ -31,12 +31,14 @@ export default function WelcomeClient({ heroPosts, sectionPosts, sidebarPosts })
       <div className="my-5 container">
         <div className="row">
           <div className="col-lg-8">
-            {SECTION_NAMES.map((name, i) => (
-              <div key={name}>
-                <Common name={name} start={0} initialPosts={sectionPosts?.[name] || []} />
-                <Adverts index={i + 1} />
-              </div>
-            ))}
+            <PromotionsProvider>
+              {SECTION_NAMES.map((name, i) => (
+                <div key={name}>
+                  <Common name={name} start={0} initialPosts={sectionPosts?.[name] || []} />
+                  <Adverts index={i + 1} />
+                </div>
+              ))}
+            </PromotionsProvider>
           </div>
 
           <div className="col-lg-4 px-lg-5">

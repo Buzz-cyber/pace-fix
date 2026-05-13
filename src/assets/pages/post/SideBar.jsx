@@ -5,14 +5,16 @@
  * Filename: SideBar.jsx
  */
 
-import { ArticleTitle, SocialPills, SideBarRecentSlider, Adverts } from "../../components"
+import { ArticleTitle, SocialPills, SideBarRecentSlider, Adverts, PromotionsProvider } from "../../components"
 import { socials } from "../../data"
 
 const SideBar = () => {
   return (
     <div>
       <ArticleTitle title="Advertise with us" class_="fs-5" width={65} />
-      <Adverts index={0} hideLabel={true} />
+      <PromotionsProvider>
+        <Adverts index={0} hideLabel={true} />
+      </PromotionsProvider>
       <ArticleTitle title="Stay Connected" class_="fs-5 mt-5" width={50} />
       <div className="my-4">
         {socials.map((item, index) => (

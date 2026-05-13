@@ -3,13 +3,13 @@ import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 import { HandleWidth } from "../custom"
-import { Adverts } from "."
+import { Adverts, PromotionsProvider } from "."
 
 const AdsSliderStrip = () => {
   const width = HandleWidth()
 
   // Ad slider settings - no controls, continuous scroll
-  // We avoid Google Ads here because Slick Slider clones elements 
+  // We avoid Google Ads here because Slick Slider clones elements
   // which breaks Google AdSense initialization.
   const adSliderSettings = {
     dots: false,
@@ -36,7 +36,8 @@ const AdsSliderStrip = () => {
   ]
 
   return (
-    <div className="mb-4 ad-slider-outer">
+    <PromotionsProvider>
+      <div className="mb-4 ad-slider-outer">
       <div className="ad-slider-container shadow-sm border rounded bg-white overflow-hidden">
         <Slider {...adSliderSettings}>
           {adItems.map((ad, index) => (
@@ -82,6 +83,7 @@ const AdsSliderStrip = () => {
         }
       `}</style>
     </div>
+    </PromotionsProvider>
   )
 }
 

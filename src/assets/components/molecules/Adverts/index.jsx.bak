@@ -1,13 +1,40 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import Image from "next/image"
-import { usePromotions } from "./PromotionsContext"
 
 const AltImage = "/default_advert.jpg"
 
 const Adverts = ({ index, hideLabel = false }) => {
-  const { data, loading } = usePromotions()
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    setLoading(true)
+
+    const fetchAds = async () => {
+      try {
+        const url = `/api/promotions?_t=${Date.now()}`
+        const res = await fetch(url, { cache: 'no-store' })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return await res.json()
+      } catch (err) {
+        console.error("Failed to fetch ads:", err)
+        return []
+      }
+    }
+
+    fetchAds().then((result) => {
+      if (mounted) {
+        setData(Array.isArray(result) ? result : [])
+        setLoading(false)
+      }
+    })
+
+    return () => { mounted = false }
+  }, [])
 
   const advert = !loading && data?.[index]
   const image = advert?.image_file || AltImage
@@ -17,11 +44,7 @@ const Adverts = ({ index, hideLabel = false }) => {
     return (
       <div className="text-center my-4" style={{ minHeight: "100px" }}>
         {!hideLabel && (
-          <p>
-            <b>
-              <small>Advertisement</small>
-            </b>
-          </p>
+          <p><b><small>Advertisement</small></b></p>
         )}
         <div className="d-block">
           <Image
@@ -40,11 +63,7 @@ const Adverts = ({ index, hideLabel = false }) => {
   return (
     <div className="text-center my-4">
       {!hideLabel && (
-        <p>
-          <b>
-            <small>Advertisement</small>
-          </b>
-        </p>
+        <p><b><small>Advertisement</small></b></p>
       )}
 
       {link ? (

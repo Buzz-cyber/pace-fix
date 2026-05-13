@@ -1,7 +1,7 @@
 import Index from "./navbar";
 import { TopHero, VerticalSegment, LittlePieceSegment } from "./newsItem";
 import { ArticleTitle, PostTitle } from "./headers";
-import { Adverts, CommentDetails, Common, SideMain, Footer } from "./molecules";
+import { Adverts, PromotionsProvider, CommentDetails, Common, SideMain, Footer } from "./molecules";
 import { LoadMore, SocialPills } from "./buttons";
 import { AuthorTime, ViewComment } from "./metaInfo";
 import { Latest, SideBarRecentSlider, BottomRecent } from "./sliders";
@@ -14,6 +14,7 @@ import AdsSliderStrip from "./AdsSliderStrip";
 export {
   AdsSliderStrip,
   Adverts,
+  PromotionsProvider,
   Index as NavBar,
   TopHero,
   VerticalSegment,

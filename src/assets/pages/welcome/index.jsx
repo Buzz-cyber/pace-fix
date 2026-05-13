@@ -4,7 +4,7 @@ import { Layout } from "..";
 import dynamic from "next/dynamic";
 import HeroSlider from "./HeroSlider";
 import "./index.css";
-import { Adverts } from "../../components";
+import { Adverts, PromotionsProvider } from "../../components";
 
 // Lazy load CommonHome-based sections with loading fallback
 const sections = [
@@ -83,14 +83,16 @@ const Welcome = () => (
     <div className="my-5 container">
       <div className="row">
         <div className="col-lg-8">
-          {sections.map(({ component: Section }, i) => (
-            <React.Fragment key={i}>
-              <Suspense fallback={<LoadingSection />}>
-                <Section />
-              </Suspense>
-              <Adverts index={i + 1} />
-            </React.Fragment>
-          ))}
+          <PromotionsProvider>
+            {sections.map(({ component: Section }, i) => (
+              <React.Fragment key={i}>
+                <Suspense fallback={<LoadingSection />}>
+                  <Section />
+                </Suspense>
+                <Adverts index={i + 1} />
+              </React.Fragment>
+            ))}
+          </PromotionsProvider>
         </div>
         <div className="col-lg-4 px-lg-5">
           <Suspense fallback={<LoadingSection />}>

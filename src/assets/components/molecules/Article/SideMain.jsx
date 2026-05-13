@@ -5,7 +5,7 @@ import "react-loading-skeleton/dist/skeleton.css"
 
 import { TextFirstSegment } from "../../newsItem"
 import { UseFetch } from "../../../custom"
-import { LatestSlider, ArticleTitle, Adverts } from "../.."
+import { LatestSlider, ArticleTitle, Adverts, PromotionsProvider } from "../.."
 
 const SideMain = ({ initialPosts = null }) => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}posts`
@@ -29,7 +29,9 @@ const SideMain = ({ initialPosts = null }) => {
       <div>
         <ArticleTitle title="latest" width={30} class_="fs-5" />
         <LatestSlider class_="mt-5" initialPosts={data} />
-        <Adverts index={5} />
+        <PromotionsProvider>
+          <Adverts index={5} />
+        </PromotionsProvider>
       </div>
     </>
   )
