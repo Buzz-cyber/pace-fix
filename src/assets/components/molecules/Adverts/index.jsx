@@ -1,33 +1,36 @@
 "use client"
 
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 import Image from "next/image"
-import useFetch from "../../../custom/UseFetch"
 
 const AltImage = "/default_advert.jpg"
 
+// Simple fetcher that doesn't cache
+const fetchPromotions = async () => {
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}promotions/`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) return [];
+  return res.json();
+};
+
 const Adverts = ({ index, hideLabel = false }) => {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}promotions/`
-  const { loading, data, refresh } = useFetch(url, "adverts")
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Refresh ads when component mounts or visibility changes
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    let mounted = true;
+    setLoading(true);
 
-  // Refresh when tab becomes visible
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        refresh()
+    fetchPromotions().then((result) => {
+      if (mounted) {
+        setData(result);
+        setLoading(false);
       }
-    }
-    document.addEventListener("visibilitychange", handleVisibilityChange)
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange)
-    }
-  }, [refresh])
+    });
+
+    return () => { mounted = false; };
+  }, []); // Empty deps = fetch fresh on every mount
 
   const advert = !loading && data?.[index]
   const image = advert?.image_file || AltImage

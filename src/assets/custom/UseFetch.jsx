@@ -35,8 +35,9 @@ const useFetch = (url, cacheKey = null) => {
     dedupingInterval,
     shouldRetryOnError: true,
     revalidateIfStale: true,
-    focusThrottleInterval: 15000, // 15 seconds minimum between revalidations on focus
-    keepPreviousData: true,
+    revalidateOnMount: true, // Always revalidate when component mounts
+    focusThrottleInterval: 5000, // 5 seconds minimum between revalidations on focus
+    keepPreviousData: false, // Don't show stale data while loading
   });
 
   return {
