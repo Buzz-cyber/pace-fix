@@ -6,44 +6,69 @@ import Image from "next/image"
 
 const AltImage = "/default_advert.jpg"
 
-// Simple fetcher that doesn't cache
-const fetchPromotions = async () => {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}promotions/`;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
-};
-
 const Adverts = ({ index, hideLabel = false }) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let mounted = true;
-    setLoading(true);
+    let mounted = true
+    setLoading(true)
 
-    fetchPromotions().then((result) => {
-      if (mounted) {
-        setData(result);
-        setLoading(false);
+    const fetchAds = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL
+        if (!baseUrl) {
+          console.error("NEXT_PUBLIC_BACKEND_API_URL is not defined")
+          return []
+        }
+        const url = `${baseUrl}promotions/?_t=${Date.now()}`
+        const res = await fetch(url, { cache: 'no-store' })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return await res.json()
+      } catch (err) {
+        console.error("Failed to fetch ads:", err)
+        return []
       }
-    });
+    }
 
-    return () => { mounted = false; };
-  }, []); // Empty deps = fetch fresh on every mount
+    fetchAds().then((result) => {
+      if (mounted) {
+        setData(Array.isArray(result) ? result : [])
+        setLoading(false)
+      }
+    })
+
+    return () => { mounted = false }
+  }, [])
 
   const advert = !loading && data?.[index]
   const image = advert?.image_file || AltImage
   const link = advert?.link || null
 
+  if (loading || !advert) {
+    return (
+      <div className="text-center my-4" style={{ minHeight: "100px" }}>
+        {!hideLabel && (
+          <p><b><small>Advertisement</small></b></p>
+        )}
+        <div className="d-block">
+          <Image
+            src={AltImage}
+            alt="Loading advert"
+            width={600}
+            height={400}
+            className="img-thumbnail rounded advert-img-max-height"
+            style={{ objectFit: "cover", opacity: 0.5 }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="text-center my-4">
       {!hideLabel && (
-        <p>
-          <b>
-            <small>Advertisement</small>
-          </b>
-        </p>
+        <p><b><small>Advertisement</small></b></p>
       )}
 
       {link ? (
