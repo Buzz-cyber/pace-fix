@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import PropTypes from "prop-types"
 import Image from "next/image"
 import useFetch from "../../../custom/UseFetch"
@@ -8,7 +9,25 @@ const AltImage = "/default_advert.jpg"
 
 const Adverts = ({ index, hideLabel = false }) => {
   const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}promotions/`
-  const { loading, data } = useFetch(url, "adverts")
+  const { loading, data, refresh } = useFetch(url, "adverts")
+
+  // Refresh ads when component mounts or visibility changes
+  useEffect(() => {
+    refresh()
+  }, [refresh])
+
+  // Refresh when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refresh()
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [refresh])
 
   const advert = !loading && data?.[index]
   const image = advert?.image_file || AltImage

@@ -10,7 +10,7 @@ const fetcher = async (url) => {
 
 // Cache durations in milliseconds
 const CACHE_DURATIONS = {
-  ADS: 30000,        // 30 seconds - ads change frequently
+  ADS: 1000,         // 1 second - ads change frequently, fresh uploads should show immediately
   POSTS: 60000,      // 1 minute - posts can be published anytime
   STATIC: 300000,    // 5 minutes - rarely changing data
 };
